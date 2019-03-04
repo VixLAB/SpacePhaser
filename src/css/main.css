@@ -195,6 +195,16 @@ html, body, .block {
     fill: #000000;
 }
 
+.linkLineg text {
+    fill: #ffffff;
+    /*text-shadow: 1px 1px #fff8ff;*/
+    text-anchor: start;
+}
+
+.light .linkLineg text {
+    fill: #000000;
+}
+
 .linkText {
     fill: #ffffff;
     /*text-shadow: 1px 1px #fff8ff;*/

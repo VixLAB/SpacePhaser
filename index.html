@@ -2,17 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Phase space</title>
+    <title>Title</title>
     <link rel="shortcut icon" type="image/x-icon" href="src/media/PhaseSpaceLogo.ico" />
-
+    <link href="https://fonts.googleapis.com/css?family=Fredoka+One|Passion+One|Russo+One&amp;subset=cyrillic,latin-ext" rel="stylesheet">
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Fredoka+One|Passion+One|Russo+One&amp;subset=cyrillic,latin-ext" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Staatliches" rel="stylesheet">
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
@@ -20,82 +18,159 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="src/lib/d3.tip.js"></script>
     <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+    <!--<script src="http://underscorejs.org/underscore.js"></script>-->
+    <script src="src/lib/underscore-min.js"></script>
+    <!--load lib-->
+    <script src="src/lib/d3.layout.wordstream.js"></script>
+    <script src="src/scripts/jsLouvain.js"></script>
 
-
-
+    <link href="https://fonts.googleapis.com/css?family=Staatliches" rel="stylesheet">
 
 </head>
 <body>
 
-    <nav class="pushpin-demo-nav" data-target="blue">
-        <ul id="listvar" class="dropdown-content">
+<nav class="pushpin-demo-nav" data-target="blue">
 
+    <div class="nav-wrapper" id="header">
+
+        <div class="brand-logo center input-field col s12 inline" >
+            Phase space of
+            <a class="dropdown-trigger" href="#!" data-target="listvar"><p id = "currentservice" class="titletext">Textual Data from Gab Post</p></a>
+        </div>
+        <div class="row s5 left hide-on-med-and-down ">
+            <ul id="nav-mobile" class="tabs tabs-transparent">
+                <li class="tab"><a class="active" href="#video">Video</a></li>
+                <li class="tab"><a  href="#demo">Demo</a></li>
+            </ul>
+        </div>
+        <ul class="right">
+            <li><a href="#!" value="dark" id = "DarkTheme" class="waves-effect waves-light">Light</a></li>
         </ul>
-
-
-            <div class="nav-wrapper" id="header">
-                <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                <div class="brand-logo center input-field col s12 inline" >
-                    Phase space of
-                    <a class="dropdown-trigger" href="#!" data-target="listvar"><p id = "currentservice" class="titletext">Temperature</p><i class="material-icons right">arrow_drop_down</i></a>
-                </div>
-                <ul id="nav-mobile" class="left hide-on-med-and-down">
-                    <li class="avatar"><a href="http://www.depts.ttu.edu/hpcc/"><img src="https://idatavisualizationlab.github.io/HPCC/PhaseSpace/src/media/logo.png" alt="TTU"></a></li>
-                    <li class="tab"><a href="https://idatavisualizationlab.github.io/HPCC/HiperView/demo.html">HiperView</a></li>
-                    <li class="tab"><a href="https://idatavisualizationlab.github.io/HPCC/HiperView/HPCC_VR/index.html">Virtual Reality</a></li>
-                    <li class="tab"><a href="https://idatavisualizationlab.github.io/HPCC/ParallelCoordinates/index.html">Parallel Coordinates</a></li>
-                </ul>
-                <ul class="right">
-                    <li><a href="#!" value="dark" id = "DarkTheme">Light</a></li>
-                </ul>
-            </div>
-    </nav>
-    <ul class="sidenav" id="mobile-demo">
-        <h3>Other projects</h3>
-        <li><a href="http://www.depts.ttu.edu/hpcc/"><img src="https://idatavisualizationlab.github.io/HPCC/HPCViz/images/TTUlogo.png" alt="Texas Tech University" class="avatar"></a></li>
-        <li><a href="https://idatavisualizationlab.github.io/HPCC/HiperView/demo.html">HiperView</a></li>
-        <li><a href="https://idatavisualizationlab.github.io/HPCC/HiperView/HPCC_VR/index.html">Virtual Reality</a></li>
-        <li><a href="https://idatavisualizationlab.github.io/HPCC/ParallelCoordinates/index.html">Parallel Coordinates</a></li>
-    </ul>
-    <div class = "menuFloat">
-        <svg class="col s1" id="legend-svg"></svg>
     </div>
-        <div class= "row">
-            <div class="row">
-                <div class="col s12 m5 offset-m1">
-                    <div class="card-panel z-depth-1 row">
-                        <div class="card-image row" id="mainPlot">
-                            <svg class="col s11" id="content"></svg>
-                        </div>
-                        <blockquote><h6 id="labelSum">Phase Space of Temperature</h6></blockquote>
-                        <div class="card-content">
-                            <p>Inspired by <a href="https://en.wikipedia.org/wiki/Phase_space">Dynamic system thoery.</a></p>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="col s12 m5">
-
-                    <div class="card-panel z-depth-1">
-                        <div class="card-image center-align" id="network">
-
-                            <svg id="networkcontent"></svg>
-                        </div>
-                        <blockquote><h6>Clustering derivation </h6></blockquote>
-                        <div class="card-content">
-                            <p>Phase space network.</p>
-                        </div>
-                    </div>
-
-                </div>
+</nav>
+<div id="video" class= "container">
+    <div class="video-container">
+        <iframe width="853" height="480" src="//www.youtube.com/embed/Q8TXgCzxEnw?rel=0" frameborder="0" allowfullscreen></iframe>
+    </div>
+</div>
+<div id="demo" class= "row">
+    <div class="cover">
+        <div class="spinnerC center">
+            <h3>loading...</h3>
+            <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div><div class="gap-patch">
+            <div class="circle"></div>
+        </div><div class="circle-clipper right">
+            <div class="circle"></div>
+        </div>
         </div>
 
+        <div class="spinner-layer spinner-red">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div><div class="gap-patch">
+            <div class="circle"></div>
+        </div><div class="circle-clipper right">
+            <div class="circle"></div>
+        </div>
+        </div>
 
-<!--load dataset-->
-<script src="src/data/hostlist.js"></script>
-<script src="src/data/serviceWed26Sep.js"></script>
-<!--load scripts-->
-<script src="src/scripts/readData.js"></script>
-<script src="src/scripts/ulti.js"></script>
-<script src="src/scripts/main.js"></script>
+        <div class="spinner-layer spinner-yellow">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div><div class="gap-patch">
+            <div class="circle"></div>
+        </div><div class="circle-clipper right">
+            <div class="circle"></div>
+        </div>
+        </div>
+
+        <div class="spinner-layer spinner-green">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div><div class="gap-patch">
+            <div class="circle"></div>
+        </div><div class="circle-clipper right">
+            <div class="circle"></div>
+        </div>
+        </div>
+    </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12 m12">
+            <div class="col s12 m12">
+                <div class="floatTitle">
+                    <h6>Word Stream</h6>
+                    <div class="card-content">
+                        <p>Collection of keyworlds and its distribution on timeline.</p>
+                    </div>
+                    <div id="legendGroup">
+
+                    </div>
+                </div>
+                <div class="card-image center-align" id="WS">
+                    <svg id="WScontent"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s3 m3">
+            <div class="card-panel  z-depth-1 hoverable">
+                <div class="card-image" id="mainPlot">
+                    <svg id="Scattercontent"></svg>
+                    <!--<svg id="legend-svg"></svg>-->
+                </div>
+                <h6>Phase Space of Textual data</h6>
+                <div class="card-content">
+                    <p>Inspired by <a href="https://en.wikipedia.org/wiki/Phase_space">Dynamic system thoery.</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col s9 m9">
+
+            <div class="card-panel z-depth-1 hoverable">
+                <div class="card-image center-align" id="network">
+                    <!--<svg id="WScontent"></svg>-->
+                    <svg id="networkcontent"></svg>
+                </div>
+                <h6>Clustering derivation </h6>
+                <div class="card-content">
+                    <p>Phase space network.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!--<div class="row">-->
+        <!--<div class="col s12 m9 offset-m3">-->
+
+            <!--<div class="card-panel z-depth-1 hoverable">-->
+                <!--<div class="card-image center-align" id="t_sne">-->
+                    <!--&lt;!&ndash;<svg id="WScontent"></svg>&ndash;&gt;-->
+                    <!--<svg id="t_sne_content"></svg>-->
+                <!--</div>-->
+                <!--<h6>T-nes</h6>-->
+                <!--<div class="card-content">-->
+                    <!--<p>Cluster by T-nes algorithm.</p>-->
+                <!--</div>-->
+            <!--</div>-->
+
+        <!--</div>-->
+    <!--</div>-->
+</div>
+
+    <!--load dataset-->
+    <script src="src/scripts/readDatav2.js"></script>
+    <!--load scripts-->
+
+    <script src="src/scripts/ulti.js"></script>
+    <script src="src/lib/tsne.js"></script>
+    <script src="src/scripts/wordstrem.js"></script>
+    <script src="src/scripts/Gabmain.js"></script>

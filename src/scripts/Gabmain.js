@@ -10,7 +10,8 @@ let service_part =0;
 
 const wssvg = d3.select("#WScontent"),
     netsvg = d3.select("#networkcontent"),
-    scsvg = d3.select("#Scattercontent");
+    scsvg = d3.select("#Scattercontent"),
+    tsnesvg = d3.select("#t_sne_content");
 let x,y,color,colorContinous,brush,legendScale,scaleX,scaleY;
 
 let dataInformation ={
@@ -57,6 +58,26 @@ let netConfig ={
     smallgrapSize: function(d){return this.width/this.ratiograph},
     fontRange:[15,20]
 };
+let tsneConfig ={
+    g:{},
+    margin: {top: 0, right: 0, bottom: 0, left: 0},
+    scalezoom: 1,
+    width: widthSvg,
+    height: heightSvg,
+    widthView: function(){return this.width*this.scalezoom},
+    heightView: function(){return this.height*this.scalezoom},
+    widthG: function(){return this.widthView()-this.margin.left-this.margin.right},
+    heightG: function(){return this.heightView()-this.margin.top-this.margin.bottom},
+    colider: function() {return this.smallgrapSize()/2},
+    ratiograph: 24,
+    smallgrapSize: function(d){return this.width/this.ratiograph},
+    fontRange:[15,20],
+    opt:{
+        epsilon : 10, // epsilon is learning rate (10 = default)
+        perplexity : 30, // roughly how many neighbors each point influences (30 = default)
+        dim : 2 // dimensionality of the embedding (2 = default)
+    },
+};
 let isColorMatchCategory = false;
 
 let dataRaw = [];
@@ -86,15 +107,6 @@ $(document).ready(function(){
     d3.select("#DarkTheme").on("click",switchTheme);
 });
 
-var initialize = _.once(initDemo);
-function initDemo(){
-    widthSvg = $('#network').width();
-    wsConfig.width = $('#WS').width();
-    scatterConfig.width = $('#mainPlot').width();
-    scatterConfig.height = scatterConfig.width;
-    netConfig.width = widthSvg;
-    init();
-}
 (function ($) {
     $.each(['show', 'hide'], function (i, ev) {
         var el = $.fn[ev];
@@ -105,10 +117,16 @@ function initDemo(){
     });
 })(jQuery);
 
+var initialize = _.once(initDemo);
 
-
-
-
+function initDemo(){
+    widthSvg = $('#network').width();
+    wsConfig.width = $('#WS').width();
+    scatterConfig.width = $('#mainPlot').width();
+    scatterConfig.height = scatterConfig.width;
+    netConfig.width = widthSvg;
+    init();
+}
 
 function init(){
 
@@ -126,7 +144,7 @@ function init(){
         initOther();
         initLegendGroup(dataRaw);
         // textSpinner.dispatch("message");
-        callSum();
+        callSum(data);
         initNetgap();
         textSpinner.text('Create network...');
         x = d3.scaleLinear()
@@ -147,11 +165,123 @@ function init(){
         nodenLink = callgapsall(data,filterConfig.limitconnect);
         //initNetgap();
         drawNetgapHuff(nodenLink,isColorMatchCategory);
+
+        // initTSNE (); //tsne
+        // drawTSNE (nestbyKey);
         d3.select('.cover').classed('hidden',true);
 
     });
 
 }
+
+function initTSNE (){
+
+    tsneConfig.margin = ({top: 0, right: 0, bottom: 0, left: 0});
+    tsneConfig.width = widthSvg;
+    tsneConfig.height = heightSvg;
+    tsnesvg
+        .attrs({
+            width: tsneConfig.width,
+            height: tsneConfig.height,
+            // overflow: "visible",
+
+        });
+    const tsnesvgG = tsnesvg.append("g")
+        .attr('class','graph')
+        .attr('transform',`translate(${tsneConfig.margin.left+tsneConfig.widthG()/2},${tsneConfig.margin.top+tsneConfig.heightG()/2})`);
+
+    tsneConfig.g = tsnesvgG ;
+    function zoomed() {
+        tsneConfig.ss = d3.event.transform.k;
+        tsneConfig.tx = d3.event.transform.x;
+        tsneConfig.ty = d3.event.transform.y;
+    }
+
+    var zoom = d3.zoom()
+    // .scaleExtent([1/netConfig.scalezoom, 40])
+        .scaleExtent([0.25, 40])
+        //.translateExtent([[-netConfig.width/2,-netConfig.height/2], [netConfig.width*1.5,netConfig.height*1.5]])
+        .on("zoom", zoomed);
+    tsnesvg.call(zoom);
+    // tsnesvg.call(tip);
+    zoom.scaleTo(tsnesvg, 1/tsneConfig.scalezoom);
+    tsnesvg.call(zoom.translateTo, tsneConfig.widthG() / 2,tsneConfig.heightG() / 2);
+
+    tsneConfig.dotrain = false;
+    tsneConfig.stepInterval = setInterval(step, 10);
+    function step() {
+        if(tsneConfig.dotrain) {
+            var cost = tsneConfig.tsne.step(); // do a few steps
+            $("#cost").html("iteration " + tsneConfig.tsne.iter + ", cost: " + cost);
+        }
+        updateEmbedding();
+    }
+    function updateEmbedding() {
+        // get current solution
+        var Y = tsneConfig.tsne.getSolution();
+        // move the groups accordingly
+        tsneConfig.g.selectAll('.linkLineg').attr("transform", function(d, i) { return "translate(" +
+            (Y[i][0]*20*tsneConfig.ss+tsneConfig.tx) + "," +
+            (Y[i][1]*20*tsneConfig.ss+tsneConfig.ty ) + ")"; });
+
+    }
+}
+
+function drawTSNE (nest) {
+    tsneConfig.dotrain = false;
+    tsneConfig.tsne = new tsnejs.tSNE(tsneConfig.opt);
+    tsneConfig.tsne.initDataRaw(nest.map(d=>d3.merge(d.values.map((e,i)=>[e.f]))));
+
+
+    tsneConfig.dotrain = true;
+
+    drawEmbedding(nest);
+
+
+    function drawEmbedding(data) {
+
+        let datapoint = tsneConfig.g.selectAll(".linkLineg")
+            .data(data);
+        let datapointN = datapoint
+            .enter().append("g")
+            .attr("id",d=>"clus_"+d.key)
+            .attr("class", "linkLineg");
+
+
+        datapointN.append("circle")
+            .attr("cx", 0)
+            .attr("cy", 0)
+            .attr("r", 5)
+            .attr('stroke-width', 1)
+            .attr('stroke', 'black')
+            .attr('fill', 'rgb(100,100,255)');
+
+        datapointN.append('path')
+            .style('stroke',d=>
+                isColorMatchCategory?color(d.values[0].topic):colorContinous(d.gap))
+            .datum(d=>d.values)
+            .attr('stroke-width',0.5);
+
+        datapointN.append("text")
+            .attr("text-anchor", "top")
+            .attr("transform", "translate(5, -5)")
+            .attr("font-size", 12);
+
+        datapoint.exit().remove();
+
+        tsneConfig.g.selectAll(".linkLineg").selectAll('path')
+            .call(d=>lineConnect(d,1))
+            .attr('stroke-width',0.5);
+
+        tsneConfig.g.selectAll(".linkLineg").selectAll('text')
+            .text(function(d,i) {return d.values[0].text })
+
+    }
+
+    tsneConfig.stepnum = 0;
+    tsneConfig.iid = -1;
+}
+
 function initLegendGroup(data){
     let nesteddata = d3.nest().key(d=>d.topic).key(d=>d.key).entries(data);
     dataInformation.lengend = {};
@@ -215,7 +345,7 @@ function recall (){
         data = filterTop(dataRaw);
     let cal2 = new Date();
     console.log('---- filter Top ----: '+(cal2-cal1));
-        callSum();
+        callSum(data);
     cal1 = new Date();
     console.log('---- call average ----: '+(cal1-cal2));
     drawWS();
@@ -228,6 +358,8 @@ function recall (){
         //initNetgap();
         drawNetgapHuff(nodenLink,isColorMatchCategory);
         drawScatter();
+
+    // drawTSNE (nestbyKey);
         d3.select('.cover').classed('hidden',true);
 }
 function initOther(){
@@ -623,7 +755,6 @@ function brushedTime (){
     // let range = s.map(wsConfig.timeScale.invert, wsConfig.timeScale);
 }
 
-
 function filterTop(dataR){
     var cal1 = new Date();
     let data =[];
@@ -687,7 +818,7 @@ function filterTop(dataR){
     console.log("--------filterTop----"+(cal2-cal1));
     return data;
 }
-function callSum(){
+function callSum(data){
     sumnet = d3.nest()
             .key(function(d) { return d.timestep; })
             .rollup(d=>{return {f: d3.mean(d,m=>m.f), df: d3.mean(d,m=>m.df), timestep:d[0].timestep}})
