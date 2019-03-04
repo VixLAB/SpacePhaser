@@ -241,7 +241,7 @@ function wordCloud(selector,config) {
             .styles({
                 'font-family': font,
                 'font-size': function(d){return d.fontSize + "px";},
-                'fill': function(d){return color(boxes.topics[d.topicIndex])},//function(d){return color(d.topicIndex);},
+                'fill': function(d){return d.data.color||color(boxes.topics[d.topicIndex])},//function(d){return color(d.topicIndex);},
                 'fill-opacity': function(d){return opacity(d.frequency)},
                 'text-anchor': 'middle',
                 'alignment-baseline': 'middle'
@@ -265,7 +265,8 @@ function wordCloud(selector,config) {
             .styles({
                 'font-family': font,
                 'font-size': function(d){return d.fontSize + "px";},
-                'fill': function(d){return color(boxes.topics[d.topicIndex])},//function(d){return color(d.topicIndex);},
+                'fill': function(d){
+                    return d.data.color||color(boxes.topics[d.topicIndex])},//function(d){return color(d.topicIndex);},
                 'fill-opacity': function(d){return opacity(d.frequency)},
                 'text-anchor': 'middle',
                 'alignment-baseline': 'middle'

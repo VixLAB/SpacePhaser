@@ -89,6 +89,23 @@ body.light {
     color: #484848
 }
 
+#header .tab a {
+    opacity:0.5;
+}
+
+nav ul li.active {
+    background-color: rgba(255,255,255,0.26);
+    border-bottom: 5px solid #ffffff73;
+}
+nav ul li.active a{
+    opacity: 1!important;
+}
+
+.light nav ul li.active {
+    background-color: rgba(0,0,0,0.1);
+    border-bottom: 5px solid #505050;
+}
+
 .titletext {
     margin-top: 0;
 }
@@ -342,4 +359,6 @@ sup {
 .deactive {
     opacity: 0.2;
 }
-
+.video-container {
+    margin-top: 2em;
+}

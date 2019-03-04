@@ -43,13 +43,20 @@ function distance (a,b){
     return Math.sqrt(dis);
 }
 function normalize(a){
-    return [scaleX(a.f),scaleY(a.df)];
+    let temp = [scaleX(a.f),scaleY(a.df)];
+    temp.timestep = a.timestep;
+    return temp;
 }
 function integration (a,b){
     let gap = 0;
-    a.forEach((t,i)=>{
-        gap += distance(t,b[i]);
-    });
+    if (a.length>b.length)
+        a.forEach((t,i)=>{
+            gap += distance(t,b.find(bb=>!(bb.timestep-t.timestep))||[0,0]);
+        });
+    else
+        b.forEach((t,i)=>{
+            gap += distance(t,a.find(aa=>!(aa.timestep-t.timestep))||[0,0]);
+        });
     return gap;
 }
 function drawSumgap(){
@@ -266,7 +273,7 @@ function lineConnect(l,scale){
         })
 }
 function activepoint(p){
-    return p.style('fill',d=>color(d.gap))
+    return p.style('fill',d=>isColorMatchCategory?color(d.gap):colorContinous(d.gap))
         .style('opacity',1)
         .attr('r',3);
 }
