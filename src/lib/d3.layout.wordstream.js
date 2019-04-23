@@ -24,7 +24,7 @@ d3.wordStream = function(){
         let boxWidth = size[0]/data.length;
         buildFontScale(data);
         buildFrequencyScale(data);
-        let boxes = buildBoxes(data);
+            let boxes = buildBoxes(data);
         //Get the sprite for each word
         getImageData(boxes);
         //Set for each stream
@@ -584,7 +584,13 @@ d3.wordStream = function(){
         return arguments.length ? (data = _, wordStream) : data;
     };
     wordStream.size = function(_){
-        return arguments.length ? (size = _, wordStream) : size;
+        if (arguments.length ){
+            size = _;
+            // cw = 1<<Math.ceil(Math.log2(size[0]));
+            // ch = 1<<Math.ceil(Math.log2(size[1]));
+            return wordStream;
+        }
+        return size;
     };
     wordStream.maxFontSize = function(_){
         return arguments.length ? (maxFontSize = _, wordStream) : maxFontSize;

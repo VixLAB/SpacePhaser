@@ -8,7 +8,7 @@ let margin = ({top: 20, right: 50, bottom: 50, left: 50});
 
 let service_part =0;
 
-const wssvg = d3.select("#WScontent"),
+let wssvg = d3.select("#WScontent"),
     netsvg = d3.select("#networkcontent"),
     scsvg = d3.select("#Scattercontent"),
     tsnesvg = d3.select("#t_sne_content");
@@ -16,15 +16,31 @@ let x,y,color,colorContinous,brush,legendScale,scaleX,scaleY;
 
 let dataInformation ={
 };
-let filterConfig = {
+
+
+let filterConfig_gab = {
+    unit: 'Score',
+    isColorMatchCategory: false,
+    timeTemp: [undefined,undefined],
+    time: [undefined,undefined],
+    maxevent : 15,
+    maxeventAll : 200,
+    limitSudden : 10,
+    limitconnect : 6,
+    scalevalueLimit: 0.1
+};
+let filterConfig_huff = {
+    unit: 'Frequency',
+    isColorMatchCategory: true,
     timeTemp: [undefined,undefined],
     time: [undefined,undefined],
     maxevent : 10,
     maxeventAll : 200,
-    limitSudden : 20,
-    limitconnect : 6,
+    limitSudden : 50,
+    limitconnect : 4,
     scalevalueLimit: 0.1
 };
+let filterConfig = filterConfig_gab;
 let scatterConfig ={
     g:{},
     margin: {top: 10, right: 10, bottom: 40, left: 40},
@@ -56,7 +72,7 @@ let netConfig ={
     colider: function() {return this.smallgrapSize()/2},
     ratiograph: 24,
     smallgrapSize: function(d){return this.width/this.ratiograph},
-    fontRange:[15,20]
+    fontRange:[20,40]
 };
 let tsneConfig ={
     g:{},
@@ -78,7 +94,7 @@ let tsneConfig ={
         dim : 2 // dimensionality of the embedding (2 = default)
     },
 };
-let isColorMatchCategory = false;
+
 
 let dataRaw = [];
 let data,nestbyKey, sumnet=[];
@@ -101,11 +117,55 @@ let tip2 = d3.tip().attr('class', 'd3-tip')
 
 $(document).ready(function(){
     //scatterConfig.scaleView = $('#mainPlot').width()/scatterConfig.width;
+    console.log('ready');
+    $('.collapsible').collapsible();
+    // $('.dropdown-trigger').dropdown();
+    $('.sidenav').sidenav();
+    discovery('#sideNavbtn');
     $('.tabs').tabs({'onShow':function(){
         if ($('#demo').css('display')!=="none")
         initialize()}});
     d3.select("#DarkTheme").on("click",switchTheme);
+    d3.select('#datacom').on("change", function () {
+        d3.select('.cover').classed('hidden', false);
+        const choice = this.value;
+        const choicetext = d3.select('#datacom').node().selectedOptions[0].text;
+        netConfig.simulation.stop();
+        setTimeout(() => {
+            filterConfig = eval('filterConfig_'+choice);
+            eval(choice)(new Date('2010')).then(function(d){
+                reset();
+                datahandle(d);
+
+                d3.select(".currentData")
+                    .text(choicetext);});
+        },0);
+    });
+    if ($('#demo').css('display')!=="none")
+        initialize();
 });
+function reset(){
+    wssvg.selectAll('*').remove();
+    netsvg.selectAll('*').remove();
+    scsvg.selectAll('*').remove();
+    filterConfig.timeTemp= [undefined,undefined];
+    filterConfig.time = [undefined,undefined];
+    // wsConfig.g.remove();
+    // wsConfig.g ={};
+    // scatterConfig.g.remove();
+    // scatterConfig.g={};
+    // netConfig.g.remove();
+    // netConfig.g = {};
+}
+function discovery(d){
+    d3.select(d).style('left','20px')
+        .classed("pulse",true)
+        .transition().delay(5000).duration(1000)
+        .style('left',null).on('end',function() {
+        d3.select(d).classed("pulse",false);
+    });
+
+}
 
 (function ($) {
     $.each(['show', 'hide'], function (i, ev) {
@@ -127,53 +187,53 @@ function initDemo(){
     netConfig.width = widthSvg;
     init();
 }
-
+let textSpinner;
 function init(){
 
-    let textSpinner = d3.select('.spinnerC').select('h3').text('load Data').on('message',(string)=>{console.log('call');
+    textSpinner = d3.select('.spinnerC').select('h3').text('load Data').on('message',(string)=>{console.log('call');
         setTimeout(function(){d3.select('.spinnerC').select('h3').text('caculate...')},0)});
     // var dispatch = d3.dispatch("updateSpinner");
     // dispatch.on("updateSpinner", (string)=>{console.log('call');
     //     d3.select('.spinnerC').select('h3').text('caculate...')});
-    readData2(new Date('2010')).then(function (d){
-        // read and assign
-        dataRaw = d;
-
-        // filter data maxevent and limitsudden
-        data = filterTop(dataRaw);
-        initOther();
-        initLegendGroup(dataRaw);
-        // textSpinner.dispatch("message");
-        callSum(data);
-        initNetgap();
-        textSpinner.text('Create network...');
-        x = d3.scaleLinear()
-            .domain([0,1]).nice()
-            .range([0, netConfig.smallgrapSize()]);
-        y = d3.scaleLinear()
-            .domain([0,1]).nice()
-            .range([netConfig.smallgrapSize(),0]);
-        initScatter ();
-        // WORD STREAM
-        initWS ();
-        drawWS();
-
-        renderWS(data);
-        // SCATTER PLOT
-        drawInstances(dataRaw);
-        drawScatter();
-        nodenLink = callgapsall(data,filterConfig.limitconnect);
-        //initNetgap();
-        drawNetgapHuff(nodenLink,isColorMatchCategory);
-
-        // initTSNE (); //tsne
-        // drawTSNE (nestbyKey);
-        d3.select('.cover').classed('hidden',true);
-
-    });
+    gab(new Date('2010')).then(function(d){datahandle(d)});
 
 }
+function datahandle(d){
+    // read and assign
+    dataRaw = d;
 
+    // filter data maxevent and limitsudden
+    data = filterTop(dataRaw);
+    initOther();
+    initLegendGroup(dataRaw);
+    // textSpinner.dispatch("message");
+    callSum(data);
+    initNetgap();
+    textSpinner.text('Create network...');
+    x = d3.scaleLinear()
+        .domain([0,1]).nice()
+        .range([0, netConfig.smallgrapSize()]);
+    y = d3.scaleLinear()
+        .domain([0,1]).nice()
+        .range([netConfig.smallgrapSize(),0]);
+    initScatter ();
+    // WORD STREAM
+    initWS ();
+    drawWS();
+
+    renderWS(data);
+    // SCATTER PLOT
+    drawInstances(dataRaw);
+    drawScatter();
+    nodenLink = callgapsall(data,filterConfig.limitconnect);
+    //initNetgap();
+    drawNetgapHuff(nodenLink,filterConfig.isColorMatchCategory);
+
+    // initTSNE (); //tsne
+    // drawTSNE (nestbyKey);
+    d3.select('.cover').classed('hidden',true);
+
+}
 function initTSNE (){
 
     tsneConfig.margin = ({top: 0, right: 0, bottom: 0, left: 0});
@@ -258,7 +318,7 @@ function drawTSNE (nest) {
 
         datapointN.append('path')
             .style('stroke',d=>
-                isColorMatchCategory?color(d.values[0].topic):colorContinous(d.gap))
+                filterConfig.isColorMatchCategory?color(d.values[0].topic):colorContinous(d.gap))
             .datum(d=>d.values)
             .attr('stroke-width',0.5);
 
@@ -287,6 +347,8 @@ function initLegendGroup(data){
     dataInformation.lengend = {};
     dataInformation.lengend.data = nesteddata.map(d=>{return{topic: d.key, terms:d.values.length}});
     dataInformation.lengend.total =d3.sum(dataInformation.lengend.data,d=>d.terms);
+    d3.select('#legendGroup')
+        .selectAll("*").remove()
     let legend_data = d3.select('#legendGroup')
         .selectAll(".row")
         .data(dataInformation.lengend.data);
@@ -344,6 +406,7 @@ function recall (){
     let cal1 = new Date();
         data = filterTop(dataRaw);
     let cal2 = new Date();
+    textSpinner.text('filter...');
     console.log('---- filter Top ----: '+(cal2-cal1));
         callSum(data);
     cal1 = new Date();
@@ -356,7 +419,7 @@ function recall (){
     cal1 = new Date();
     console.log('---- call LINK ----: '+(cal1-cal2));
         //initNetgap();
-        drawNetgapHuff(nodenLink,isColorMatchCategory);
+        drawNetgapHuff(nodenLink,filterConfig.isColorMatchCategory);
         drawScatter();
 
     // drawTSNE (nestbyKey);
@@ -430,7 +493,7 @@ function initScatter () {
             .attr("font-weight", "bold")
             .attr("text-anchor", "end")
             .attr('class','labelx axisLabel')
-            .text("Score"));
+            .text(filterConfig.unit));
     scatterConfig.yAxis = g => g
         .attr("transform", `translate(0,0)`)
         .call(d3.axisLeft(scatterConfig.y).ticks(5))
@@ -441,7 +504,7 @@ function initScatter () {
             .attr("text-anchor", "start")
             .attr("font-weight", "bold")
             .attr('class','labely axisLabel')
-            .text("\u0394 "+"Score"));
+            .text("\u0394 "+filterConfig.unit));
     scsvg.gIn = scsvg.g.append('g')
         .attr('id','InstancePlot');
     scsvg.select('.axis').append('g')
@@ -587,7 +650,7 @@ function drawScatter(){
         cx: d=>scatterConfig.x(d.values[0].f),
         cy: d=>scatterConfig.y(d.values[0].df),
         r:  2})
-        .style('fill',d=> isColorMatchCategory?color(d.values[0].topic):null)
+        .style('fill',d=> filterConfig.isColorMatchCategory?color(d.values[0].topic):null)
         .on('mouseover',function(d){
             tip2.show(d);
             mouseoverHandel(d);})
@@ -636,7 +699,7 @@ function mouseoverHandel(datain){
     else
         currentHost.append('path').datum(d=>d.values).call(scatterConfig.lineConnect)
             .style('stroke',d=> {
-                return isColorMatchCategory?color(d[0].values[0].topic):colorContinous(nestbyKey.find(e=>e.key === datapoint.key).gap)})
+                return filterConfig.isColorMatchCategory?color(d[0].values[0].topic):colorContinous(nestbyKey.find(e=>e.key === datapoint.key).gap)})
             .transition()
             .duration(2000)
             .attrTween("stroke-dasharray", tweenDash);
@@ -816,6 +879,7 @@ function filterTop(dataR){
     });
     var cal2 = new Date();
     console.log("--------filterTop----"+(cal2-cal1));
+    console.log(data.length);
     return data;
 }
 function callSum(data){
@@ -979,7 +1043,8 @@ function drawNetgapHuff(nodenLink,colorby){
     netConfig.scalerevse.domain(d3.extent(links,d=>d.value));
     netConfig.invertscale.domain(d3.extent(nodes,d=>d.value));
     // let fontscale = d3.scaleLog().domain(d3.extent(nodenLink.nodes, d=>d.value)).range(netConfig.fontRange);
-    let fontscale = d3.scaleLinear().domain(d3.extent(nodenLink.nodes, d=>d.values[0].df)).range(netConfig.fontRange);
+
+    let fontscale = d3.scaleLinear().domain(d3.extent(nodenLink.nodes, d=>d3.max(d.values,e=>e.values[0].f))).range(netConfig.fontRange);
 
 
     const netsvgG = netConfig.g;
@@ -1013,7 +1078,7 @@ function drawNetgapHuff(nodenLink,colorby){
 
     netConfig.node.select('path')
         .style('stroke',d=>
-            isColorMatchCategory?color(d.topic):colorContinous(d.gap))
+            filterConfig.isColorMatchCategory?color(d.topic):colorContinous(d.gap))
         .datum(d=>d.values)
         .call(d=>lineConnect(d,1))
         .attr('stroke-width',0.5);
@@ -1029,7 +1094,7 @@ function drawNetgapHuff(nodenLink,colorby){
 
     newsvg.append('path')
         .style('stroke',d=>
-            isColorMatchCategory?color(d.topic):colorContinous(d.gap))
+            filterConfig.isColorMatchCategory?color(d.topic):colorContinous(d.gap))
         .datum(d=>d.values)
         .call(d=>lineConnect(d,1))
         .attr('stroke-width',0.5);
@@ -1108,7 +1173,8 @@ function drawNetgapHuff(nodenLink,colorby){
             y:netConfig.smallgrapSize(),
             // dy: ".30em"
         // }).style('font-size',d=>fontscale(d.gap));
-    }).style('font-size',d=>fontscale(d3.max(d.values,e=>e.values[0].df)));
+    }).style('font-size',d=>{
+        return fontscale(d3.max(d.values,e=>e.values[0].df))+'px'});
 
     // netConfig.node.select('path')
     netConfig.nodeText
@@ -1180,7 +1246,7 @@ function renderWS (data){
     let TermwDay = d3.nest().key(d=>d.timestep)
         .key(d=>d.topic)
         .rollup(e=>{return e.filter(d=>d.f).map(d=> {
-            d.color = isColorMatchCategory?undefined:colorContinous(nestbyKey.find(it=>it.key===d.key).gap);
+            d.color = filterConfig.isColorMatchCategory?undefined:colorContinous(nestbyKey.find(it=>it.key===d.key).gap);
             return {
             frequency: Math.sqrt(d.frequency),
                 sudden: d.sudden,
@@ -1217,5 +1283,18 @@ function hightlightWS(d1){
             let TR = d1||filterConfig.time.map(wsConfig.time2index.invert);
             return (cT < TR[0]) || (cT > TR[1]); //in range time
         }).classed('disableWord',true);
+}
+
+// ui part
+function openNav() {
+    d3.select("#mySidenav").classed("sideIn",true);
+    d3.select("#Maincontent").classed("sideIn",true);
+    // _.delay(resetSize, 500);
+}
+
+function closeNav() {
+    d3.select("#mySidenav").classed("sideIn",false);
+    d3.select("#Maincontent").classed("sideIn",false);
+    // _.delay(resetSize, 500);
 }
 

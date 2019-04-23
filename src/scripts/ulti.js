@@ -273,7 +273,7 @@ function lineConnect(l,scale){
         })
 }
 function activepoint(p){
-    return p.style('fill',d=>isColorMatchCategory?color(d.gap):colorContinous(d.gap))
+    return p.style('fill',d=>filterConfig.isColorMatchCategory?color(d.gap):colorContinous(d.gap))
         .style('opacity',1)
         .attr('r',3);
 }

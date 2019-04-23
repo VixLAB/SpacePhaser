@@ -77,8 +77,8 @@ function wordCloud(selector,config) {
         var offsetLegend = 50;
         var axisPadding = 10;
         var margins = {top: 0, right: 0, bottom: 10, left: 0};
-        var min = 10;
-        var max = 15;
+        var min = 15;
+        var max = 20;
         lineColor.domain([min, max]);
         width = config.width;
         var height = config.height;
@@ -314,6 +314,9 @@ function wordCloud(selector,config) {
                 .style('fill-opacity', function(d){return opacity(d.frequency)});
             //hidetip();
         });
+
+        const cal3 = new Date();
+        console.log('---- Analyzing Word Stream END----: '+(cal3-cal2));
         //Click
 
     }

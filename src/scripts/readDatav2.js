@@ -4,9 +4,9 @@ var serviceLists = [{text: "Huff", id: 0,
 var serviceListattr = ["arr"];
 var chosenService = 0;
 
-function readData(startCut,endCut) {
+var huff= function (startCut,endCut) {
     // return d3.json("src/data/Huffv2.json").then((data)=>{
-    return d3.json("src/data/Huffv3.json").then((data)=>{
+    return d3.json("src/data/Huffv4.json").then((data)=>{
         // let timestep = d3.nest().key(d=>d.timestep).entries(data).length;
         let timestep = data[0].values[0].value.length;
         let timerange = d3.range(timestep).map(function(d) { return new Date(2007, d);});
@@ -19,6 +19,8 @@ function readData(startCut,endCut) {
                         topic: topics.key,
                         text: it.text,
                         f: it.frequency,
+                        frequency: it.frequency,
+                        sudden:it.sudden,
                         timestep: timestepIt,
                         df: it.sudden});
             }));
@@ -35,7 +37,7 @@ function readData(startCut,endCut) {
     });
 }
 
-function readData2(startCut,endCut) {
+var gab = function (startCut,endCut) {
     // return d3.json("src/data/Huffv2.json").then((data)=>{
     return d3.json("src/data/gab_crime.json").then((data)=>{
         // let timestep = d3.nest().key(d=>d.timestep).entries(data).length;
@@ -48,7 +50,7 @@ function readData2(startCut,endCut) {
                 f:it.s,
                 df:it.ds,
                 frequency: it.f,
-                suddne:it.df,
+                sudden:it.df,
                 key: it.key,
                 text: it.text,
                 topic: it.topic,

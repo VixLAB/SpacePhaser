@@ -372,3 +372,111 @@ sup {
 .video-container {
     margin-top: 2em;
 }
+.sidenavs {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.21);
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 80px;
+}
+.sidenavs a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    display: block;
+    transition: 0.3s;
+}
+.sidenavs a:hover {
+    color: #f1f1f1;
+}
+.sidenavs #datasetsSelectTrigger img {
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+}
+.sidenavs #datasetsSelectTrigger {
+    color: black;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border: 1px solid #f2f2f2;
+    border-radius: 2px;
+    height: 3rem;
+}
+.sidenavs #search {
+    font-size: inherit;
+}
+.sidenavs .collapsible {
+    border: none;
+}
+.sidenavs .collapsible .collapsible-header {
+    background-color: transparent;
+    font-size: large;
+}
+.sidenavs .collapsible .collapsible-body {
+    padding: 1rem;
+}
+.sidenavs select {
+    padding: 0;
+    height: auto;
+    display: inline-block;
+    width: auto;
+}
+
+#Maincontent {
+    margin-left: 0px;
+    transition: all 0.5s;
+}
+
+.closebtn {
+    position: fixed;
+    top: 50%;
+    left: -40px;
+}
+
+.overlaySide:hover .openbtn {
+    left: 20px;
+}
+
+.overlaySide {
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0px;
+    left: -20px;
+    background-color: rgba(0, 0, 0, 0);
+    z-index: 999;
+    width: 40px;
+    height: 100%;
+}
+.overlaySide .openbtn {
+    position: absolute;
+    top: 50%;
+    left: -30px;
+}
+
+.sideIn.sidenavs {
+    width: 350px;
+}
+
+.sideIn#Maincontent {
+    position: relative;
+    margin-left: 350px;
+}
+
+.sideIn #scatterzone {
+    left: 350px;
+}
+.sideIn .closebtn {
+    top: 50%;
+    left: 330px;
+    transition: 0.5s;
+}
+.sideIn .overlaySide {
+    left: -80px;
+}

@@ -49,123 +49,154 @@
         </ul>
     </div>
 </nav>
-<div id="video" class= "container">
-    <div class="video-container">
-        <iframe width="853" height="480" src="//www.youtube.com/embed/Q8TXgCzxEnw?rel=0" frameborder="0" allowfullscreen></iframe>
+<div id="mySidenav" class="sidenavs">
+    <div class="row s12">
+        <ul class="collapsible">
+            <li class="active">
+                <div class="collapsible-header"><i class="material-icons">settings</i>  Setting</div>
+                <div class="collapsible-body">
+                    <label for="datacom" class="col s4"> Dataset: </label>
+                    <div  class="row s12">
+                        <select id="datacom" class="col s7">
+                            <option value="gab" selected="selected">Gab posts</option>
+                            <option value="huff">Huffington post</option>
+                            <!--<option value="influxdb_range">&#45;&#45;&#45;&#45;custom-&#45;&#45;&#45;&#45;</option>-->
+                        </select>
+                    </div>
+
+                </div>
+            </li>
+            <!--<li>-->
+                <!--<div class="collapsible-header"><i class="material-icons">help</i>Controls</div>-->
+                <!--<div class="collapsible-body"><strong>Zoom</strong>: Scroll mouse button to zoom.<br/></div>-->
+            <!--</li>-->
+        </ul>
     </div>
 </div>
-<div id="demo" class= "row">
-    <div class="cover">
-        <div class="spinnerC center">
-            <h3>loading...</h3>
-            <div class="preloader-wrapper big active">
-        <div class="spinner-layer spinner-blue">
-            <div class="circle-clipper left">
-                <div class="circle"></div>
-            </div><div class="gap-patch">
-            <div class="circle"></div>
-        </div><div class="circle-clipper right">
-            <div class="circle"></div>
-        </div>
-        </div>
 
-        <div class="spinner-layer spinner-red">
-            <div class="circle-clipper left">
-                <div class="circle"></div>
-            </div><div class="gap-patch">
-            <div class="circle"></div>
-        </div><div class="circle-clipper right">
-            <div class="circle"></div>
-        </div>
-        </div>
-
-        <div class="spinner-layer spinner-yellow">
-            <div class="circle-clipper left">
-                <div class="circle"></div>
-            </div><div class="gap-patch">
-            <div class="circle"></div>
-        </div><div class="circle-clipper right">
-            <div class="circle"></div>
-        </div>
-        </div>
-
-        <div class="spinner-layer spinner-green">
-            <div class="circle-clipper left">
-                <div class="circle"></div>
-            </div><div class="gap-patch">
-            <div class="circle"></div>
-        </div><div class="circle-clipper right">
-            <div class="circle"></div>
-        </div>
+<div id="Maincontent" class="row s12">
+    <a href="javascript:void(0)" class="closebtn btn-floating btn waves-effect waves-light" onclick="closeNav()"><i class="material-icons">chevron_left</i></a>
+    <div class="overlaySide">
+        <a class="openbtn btn-floating btn waves-effect waves-light" id="sideNavbtn" onclick="openNav()">
+            <i class="material-icons">chevron_right</i></a>
+    </div>
+    <div id="video" class= "container">
+        <div class="video-container">
+            <iframe width="853" height="480" src="//www.youtube.com/embed/Q8TXgCzxEnw?rel=0" frameborder="0" allowfullscreen></iframe>
         </div>
     </div>
+    <div id="demo" class= "row">
+        <div class="cover">
+            <div class="spinnerC center">
+                <h3>loading...</h3>
+                <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div><div class="gap-patch">
+                <div class="circle"></div>
+            </div><div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+            </div>
+
+            <div class="spinner-layer spinner-red">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div><div class="gap-patch">
+                <div class="circle"></div>
+            </div><div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+            </div>
+
+            <div class="spinner-layer spinner-yellow">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div><div class="gap-patch">
+                <div class="circle"></div>
+            </div><div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+            </div>
+
+            <div class="spinner-layer spinner-green">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div><div class="gap-patch">
+                <div class="circle"></div>
+            </div><div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col s12 m12">
+            </div>
+        </div>
+        <div class="row">
             <div class="col s12 m12">
-                <div class="floatTitle">
-                    <h6>Word Stream</h6>
+                <div class="col s12 m12">
+                    <div class="floatTitle">
+                        <h6>Word Stream</h6>
+                        <div class="card-content">
+                            <p>Collection of keyworlds and its distribution on timeline.</p>
+                        </div>
+                        <div id="legendGroup">
+
+                        </div>
+                    </div>
+                    <div class="card-image center-align" id="WS">
+                        <svg id="WScontent"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s3 m3">
+                <div class="card-panel  z-depth-1 hoverable">
+                    <div class="card-image" id="mainPlot">
+                        <svg id="Scattercontent"></svg>
+                        <!--<svg id="legend-svg"></svg>-->
+                    </div>
+                    <h6>Phase Space of Textual data</h6>
                     <div class="card-content">
-                        <p>Collection of keyworlds and its distribution on timeline.</p>
-                    </div>
-                    <div id="legendGroup">
-
+                        <p>Inspired by <a href="https://en.wikipedia.org/wiki/Phase_space">Dynamic system thoery.</a></p>
                     </div>
                 </div>
-                <div class="card-image center-align" id="WS">
-                    <svg id="WScontent"></svg>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col s3 m3">
-            <div class="card-panel  z-depth-1 hoverable">
-                <div class="card-image" id="mainPlot">
-                    <svg id="Scattercontent"></svg>
-                    <!--<svg id="legend-svg"></svg>-->
-                </div>
-                <h6>Phase Space of Textual data</h6>
-                <div class="card-content">
-                    <p>Inspired by <a href="https://en.wikipedia.org/wiki/Phase_space">Dynamic system thoery.</a></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col s9 m9">
-
-            <div class="card-panel z-depth-1 hoverable">
-                <div class="card-image center-align" id="network">
-                    <!--<svg id="WScontent"></svg>-->
-                    <svg id="networkcontent"></svg>
-                </div>
-                <h6>Clustering derivation </h6>
-                <div class="card-content">
-                    <p>Phase space network.</p>
-                </div>
             </div>
 
-        </div>
-    </div>
-    <!--<div class="row">-->
-        <!--<div class="col s12 m9 offset-m3">-->
+            <div class="col s9 m9">
 
-            <!--<div class="card-panel z-depth-1 hoverable">-->
-                <!--<div class="card-image center-align" id="t_sne">-->
-                    <!--&lt;!&ndash;<svg id="WScontent"></svg>&ndash;&gt;-->
-                    <!--<svg id="t_sne_content"></svg>-->
+                <div class="card-panel z-depth-1 hoverable">
+                    <div class="card-image center-align" id="network">
+                        <!--<svg id="WScontent"></svg>-->
+                        <svg id="networkcontent"></svg>
+                    </div>
+                    <h6>Clustering derivation </h6>
+                    <div class="card-content">
+                        <p>Phase space network.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!--<div class="row">-->
+            <!--<div class="col s12 m9 offset-m3">-->
+
+                <!--<div class="card-panel z-depth-1 hoverable">-->
+                    <!--<div class="card-image center-align" id="t_sne">-->
+                        <!--&lt;!&ndash;<svg id="WScontent"></svg>&ndash;&gt;-->
+                        <!--<svg id="t_sne_content"></svg>-->
+                    <!--</div>-->
+                    <!--<h6>T-nes</h6>-->
+                    <!--<div class="card-content">-->
+                        <!--<p>Cluster by T-nes algorithm.</p>-->
+                    <!--</div>-->
                 <!--</div>-->
-                <!--<h6>T-nes</h6>-->
-                <!--<div class="card-content">-->
-                    <!--<p>Cluster by T-nes algorithm.</p>-->
-                <!--</div>-->
+
             <!--</div>-->
-
         <!--</div>-->
-    <!--</div>-->
+    </div>
 </div>
-
     <!--load dataset-->
     <script src="src/scripts/readDatav2.js"></script>
     <!--load scripts-->

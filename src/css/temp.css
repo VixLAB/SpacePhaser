@@ -170,3 +170,17 @@ blockquote{
 .disableWord {
     opacity:0.1;
 }
+
+
+#mySidenav .collapsible {
+    border: none;
+}
+#mySidenav .collapsible .collapsible-header{
+    background-color: transparent;
+    font-size: large
+}
+
+#mySidenav .collapsible .collapsible-body{
+    /*background-color: #ffffff3d;*/
+    padding: 1rem;
+}
