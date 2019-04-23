@@ -72,7 +72,7 @@ let netConfig ={
     colider: function() {return this.smallgrapSize()/2},
     ratiograph: 24,
     smallgrapSize: function(d){return this.width/this.ratiograph},
-    fontRange:[20,40]
+    fontRange:[15,20]
 };
 let tsneConfig ={
     g:{},
