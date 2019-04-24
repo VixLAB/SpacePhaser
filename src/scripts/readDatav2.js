@@ -68,3 +68,36 @@ var gab = function (startCut,endCut) {
         // });
     });
 }
+
+var adl = function (startCut,endCut) {
+    // return d3.json("src/data/Huffv2.json").then((data)=>{
+    return d3.json("src/data/adl_output.json").then((data)=>{
+        // let timestep = d3.nest().key(d=>d.timestep).entries(data).length;
+        // let timestep = data[0].values[0].value.length;
+        // let timerange = d3.range(timestep).map(function(d) { return new Date(2007, d);});
+        let dataRead = [];
+        data.forEach(ww=>{
+            d3.keys(ww.words).forEach(topic=>{
+                ww.words[topic].forEach(d=>{
+                    dataRead.push({key: ("_"+d.text+"-"+topic).replace(/'|&| |\//gi, ""),
+                        topic: topic,
+                        text: d.text,
+                        f: d.frequency,
+                        frequency: d.frequency,
+                        sudden: d.sudden,
+                        timestep: new Date(ww.date),
+                        df: d.sudden});
+                })
+            })
+        });
+        return dataRead;
+        // return data.map(d=>{
+        //     return {key: d.fam.replace("'", ""),
+        //     topic: d.topic,
+        //     text: d.text,
+        //     f: ~~d.frequency,
+        //     timestep: timerange[~~d.timestep],
+        //     df: ~~d.sudden}
+        // });
+    });
+}

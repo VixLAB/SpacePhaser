@@ -26,7 +26,18 @@ let filterConfig_gab = {
     maxevent : 15,
     maxeventAll : 200,
     limitSudden : 10,
-    limitconnect : 6,
+    limitconnect : 4,
+    scalevalueLimit: 0.1
+};
+let filterConfig_adl  = {
+    unit: 'Frequency',
+    isColorMatchCategory: true,
+    timeTemp: [undefined,undefined],
+    time: [undefined,undefined],
+    maxevent : 15,
+    maxeventAll : 500,
+    limitSudden : 2,
+    limitconnect : 1,
     scalevalueLimit: 0.1
 };
 let filterConfig_huff = {
@@ -676,8 +687,6 @@ function drawScatter(){
 }
 
 function mouseoverHandel(datain){
-    console.log(datain);
-
     let timestep = datain.key;
     let datapoint = datain.values[0];
     let cpoint = scsvg.g.selectAll(".gCategory").filter(f=>f.key!==datapoint.key);
@@ -686,9 +695,30 @@ function mouseoverHandel(datain){
     let currentHost = scsvg.g.select("#"+datapoint.key);
     updateSpike(datapoint.f,datapoint.df,datapoint.timestep);
     netsvg.selectAll(".linkLineg").style('opacity',0.2);
+    netsvg.selectAll(".linkText").style('opacity',0.2);
     d3.select('#mini'+datapoint.key).style('opacity',1);
+    d3.select('#text'+datapoint.key).style('opacity',1);
     d3.selectAll(".linkGap").style('stroke-opacity',0.1);
-    d3.selectAll(".linkGap").filter(d=>d.source.key===datapoint.key||d.target.key===datapoint.key).style('stroke-opacity',1);
+    // word stream
+    wssvg.selectAll('.gtext').filter(d=>d.data.key!==datapoint.key).style('opacity',0.1);
+    d3.selectAll(".linkGap").filter(d=>{
+        if (d.source.key===datapoint.key)
+        {
+            d3.select('#text' + d.target.key).style('opacity', 1);
+            d3.select('#mini'+d.target.key).style('opacity',1);
+            wssvg.selectAll('.gtext').filter(s=>s.data.key===d.target.key).style('opacity',1)
+                .select('.stext').attr('visibility','visible');
+            return true;
+        }
+        if (d.target.key===datapoint.key)
+        {
+            d3.select('#text' + d.source.key).style('opacity', 1);
+            d3.select('#mini'+d.source.key).style('opacity',1);
+            wssvg.selectAll('.gtext').filter(s=>s.data.key===d.source.key).style('opacity',1)
+                .select('.stext').attr('visibility','visible');
+            return true;
+        }
+    return false;}).style('stroke-opacity',1);
 
     if (!currentHost.select('.linkLine').empty())
         currentHost.select('.linkLine').datum(d=>d.values)
@@ -703,8 +733,7 @@ function mouseoverHandel(datain){
             .transition()
             .duration(2000)
             .attrTween("stroke-dasharray", tweenDash);
-    // word stream
-    wssvg.selectAll('.gtext').filter(d=>d.data.key!==datapoint.key).style('opacity',0.1);
+
     function tweenDash() {
         var l = this.getTotalLength(),
             i = d3.interpolateString("0," + l, l + "," + l);
@@ -719,8 +748,9 @@ function mouseleaveHandel(){
         .call(activepoint);
     scsvg.g.selectAll(".linkLine").style("opacity",0.5);
     netsvg.selectAll(".linkLineg").style('opacity',1);
+    netsvg.selectAll(".linkText").style('opacity',1);
     netsvg.selectAll(".linkGap").style('stroke-opacity',0.5);
-    wssvg.selectAll('.gtext').style('opacity',1);
+    wssvg.selectAll('.gtext').style('opacity',1).select('.stext').attr('visibility',d=>d.placed? "visible": "hidden");
     updateSpike();
 }
 function initWS () {
@@ -1138,8 +1168,6 @@ function drawNetgapHuff(nodenLink,colorby){
             mouseleaveHandel();
             netConfig.simulation.restart();
 
-            netsvg.selectAll(".linkLineg").style('opacity',1);
-            netsvg.selectAll(".linkGap").style('stroke-opacity',0.5);
             tip.hide()})
         .call(dragForce(netConfig.simulation));
 
@@ -1263,6 +1291,7 @@ function renderWS (data){
         });
         delete t.values;
     });
+    TermwDay.sort((a,b)=>new Date(a.key)-new Date(b.key));
     wsConfig.wstep = wsConfig.widthG()/TermwDay.length;
     const cal2 = new Date();
     console.log('Word Stream calculate time: '+(cal2-cal1));

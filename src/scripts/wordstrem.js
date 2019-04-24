@@ -260,6 +260,8 @@ function wordCloud(selector,config) {
                 'font-family': font,
                 'font-size': function(d){return d.fontSize + "px";},
                 topic: function(d){return d.topic;},
+                key: function(d){return d.data.key;},
+                placed: function(d){return d.placed;},
                 visibility: function(d){ return d.placed ? (placed? "visible": "hidden"): (placed? "hidden": "visible");}
             })
             .styles({
@@ -284,7 +286,7 @@ function wordCloud(selector,config) {
 
             var text = thisText.text();
             var topic = thisText.attr('topic');
-            mainGroup.selectAll('.stext').style('fill-opacity', 0.2);
+            // mainGroup.selectAll('.stext').style('fill-opacity', 0.2);
             var allTexts = mainGroup.selectAll('.stext').filter(t =>{
                 var sameTerm = t && t.text === text &&  t.topic === topic;
                 var sameArticle = false;
@@ -299,6 +301,7 @@ function wordCloud(selector,config) {
             // });
 
             //showTip(d,wordTip);
+            mouseoverHandel({key:d.data.timestep,values:[d.data]});
         });
 
         mainGroup.selectAll('.stext').on('mouseleave', function(d){
@@ -312,6 +315,7 @@ function wordCloud(selector,config) {
 
             allTexts
                 .style('fill-opacity', function(d){return opacity(d.frequency)});
+            mouseleaveHandel();
             //hidetip();
         });
 

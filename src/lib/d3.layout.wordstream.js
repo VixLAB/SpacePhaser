@@ -65,12 +65,14 @@ d3.wordStream = function(){
         let minFrequency = Number.MAX_SAFE_INTEGER;
         d3.map(data, function(box){     // thuc hien ham box tren tung phan tu cua data (timestep)
             d3.map(topics, function(topic){     // thuc hien ham topic tren tung phan tu cua topics
+                if (box.words[topic]===undefined)
+                    box.words[topic] = []
                 let max = d3.max(box.words[topic], function(d){
                     return d.frequency;         // lay ra freq cao nhat cua 1 record
-                });
+                })||0;
                 let min = d3.min(box.words[topic], function(d){
                     return d.frequency;
-                });
+                })||0;
                 if(maxFrequency < max) maxFrequency = max;
                 if(minFrequency > min) minFrequency = min;
             })
