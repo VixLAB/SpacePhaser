@@ -19,29 +19,29 @@ let dataInformation ={
 
 
 let filterConfig_gab = {
-    unit: 'Score',
+    unit: {f:'Score',df:'\u0394 Score'},
     isColorMatchCategory: false,
     timeTemp: [undefined,undefined],
     time: [undefined,undefined],
-    maxevent : 15,
-    maxeventAll : 200,
-    limitSudden : 10,
+    maxevent : 10,
+    maxeventAll : 100,
+    limitSudden : 20,
     limitconnect : 4,
     scalevalueLimit: 0.1
 };
 let filterConfig_adl  = {
-    unit: 'Frequency',
+    unit: {f:'Frequency',df:'Sudden'},
     isColorMatchCategory: true,
     timeTemp: [undefined,undefined],
     time: [undefined,undefined],
-    maxevent : 15,
-    maxeventAll : 500,
-    limitSudden : 2,
+    maxevent : 10,
+    maxeventAll : 200,
+    limitSudden : 10,
     limitconnect : 1,
     scalevalueLimit: 0.1
 };
 let filterConfig_huff = {
-    unit: 'Frequency',
+    unit: {f:'Frequency',df:'Sudden'},
     isColorMatchCategory: true,
     timeTemp: [undefined,undefined],
     time: [undefined,undefined],
@@ -504,7 +504,7 @@ function initScatter () {
             .attr("font-weight", "bold")
             .attr("text-anchor", "end")
             .attr('class','labelx axisLabel')
-            .text(filterConfig.unit));
+            .text(filterConfig.unit.f));
     scatterConfig.yAxis = g => g
         .attr("transform", `translate(0,0)`)
         .call(d3.axisLeft(scatterConfig.y).ticks(5))
@@ -515,7 +515,7 @@ function initScatter () {
             .attr("text-anchor", "start")
             .attr("font-weight", "bold")
             .attr('class','labely axisLabel')
-            .text("\u0394 "+filterConfig.unit));
+            .text(filterConfig.unit.df));
     scsvg.gIn = scsvg.g.append('g')
         .attr('id','InstancePlot');
     scsvg.select('.axis').append('g')
