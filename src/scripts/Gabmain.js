@@ -141,20 +141,43 @@ $(document).ready(function(){
         d3.select('.cover').classed('hidden', false);
         const choice = this.value;
         const choicetext = d3.select('#datacom').node().selectedOptions[0].text;
+        d3.select('#currentservice').text('Textual Data from '+choicetext);
         netConfig.simulation.stop();
         setTimeout(() => {
-            filterConfig = eval('filterConfig_'+choice);
-            eval(choice)(new Date('2010')).then(function(d){
+            filterConfig = eval('filterConfig_' + choice);
+            $('#colorby')[0].value = filterConfig.isColorMatchCategory.toString();
+            eval(choice)(new Date('2010')).then(function (d) {
                 reset();
                 datahandle(d);
-
-                d3.select(".currentData")
-                    .text(choicetext);});
+            }, 0);
+        })
+    });
+    d3.select('#colorby').on("change", function () {
+        d3.select('.cover').classed('hidden', false);
+        filterConfig.isColorMatchCategory = (this.value==="true");
+        setTimeout(() => {
+            colorchange();
         },0);
     });
     if ($('#demo').css('display')!=="none")
         initialize();
 });
+
+function colorchange (){
+    scsvg.g.selectAll(".gCategory")
+        .selectAll(".datapoint")
+        .style('fill',d=> filterConfig.isColorMatchCategory?color(d.values[0].topic):null);
+    scsvg.g.selectAll(".linkLine")
+        .style('stroke',d=> {
+            return filterConfig.isColorMatchCategory?color(d[0].values[0].topic):colorContinous(nestbyKey.find(e=>e.key === d[0].values[0].key).gap)});
+    netConfig.node.select('path')
+        .style('stroke',d=>
+            filterConfig.isColorMatchCategory?color(d.topic):colorContinous(d.gap));
+    wssvg.g.selectAll('.stext')
+        .style('fill',d=> filterConfig.isColorMatchCategory?null:d.data.color);
+    d3.select('#legendGroup').selectAll('span.color-bar').style("background", function(d,i) { return filterConfig.isColorMatchCategory?color(d.topic):null})
+    d3.select('.cover').classed('hidden', true);
+}
 function reset(){
     wssvg.selectAll('*').remove();
     netsvg.selectAll('*').remove();
@@ -245,113 +268,6 @@ function datahandle(d){
     d3.select('.cover').classed('hidden',true);
 
 }
-function initTSNE (){
-
-    tsneConfig.margin = ({top: 0, right: 0, bottom: 0, left: 0});
-    tsneConfig.width = widthSvg;
-    tsneConfig.height = heightSvg;
-    tsnesvg
-        .attrs({
-            width: tsneConfig.width,
-            height: tsneConfig.height,
-            // overflow: "visible",
-
-        });
-    const tsnesvgG = tsnesvg.append("g")
-        .attr('class','graph')
-        .attr('transform',`translate(${tsneConfig.margin.left+tsneConfig.widthG()/2},${tsneConfig.margin.top+tsneConfig.heightG()/2})`);
-
-    tsneConfig.g = tsnesvgG ;
-    function zoomed() {
-        tsneConfig.ss = d3.event.transform.k;
-        tsneConfig.tx = d3.event.transform.x;
-        tsneConfig.ty = d3.event.transform.y;
-    }
-
-    var zoom = d3.zoom()
-    // .scaleExtent([1/netConfig.scalezoom, 40])
-        .scaleExtent([0.25, 40])
-        //.translateExtent([[-netConfig.width/2,-netConfig.height/2], [netConfig.width*1.5,netConfig.height*1.5]])
-        .on("zoom", zoomed);
-    tsnesvg.call(zoom);
-    // tsnesvg.call(tip);
-    zoom.scaleTo(tsnesvg, 1/tsneConfig.scalezoom);
-    tsnesvg.call(zoom.translateTo, tsneConfig.widthG() / 2,tsneConfig.heightG() / 2);
-
-    tsneConfig.dotrain = false;
-    tsneConfig.stepInterval = setInterval(step, 10);
-    function step() {
-        if(tsneConfig.dotrain) {
-            var cost = tsneConfig.tsne.step(); // do a few steps
-            $("#cost").html("iteration " + tsneConfig.tsne.iter + ", cost: " + cost);
-        }
-        updateEmbedding();
-    }
-    function updateEmbedding() {
-        // get current solution
-        var Y = tsneConfig.tsne.getSolution();
-        // move the groups accordingly
-        tsneConfig.g.selectAll('.linkLineg').attr("transform", function(d, i) { return "translate(" +
-            (Y[i][0]*20*tsneConfig.ss+tsneConfig.tx) + "," +
-            (Y[i][1]*20*tsneConfig.ss+tsneConfig.ty ) + ")"; });
-
-    }
-}
-
-function drawTSNE (nest) {
-    tsneConfig.dotrain = false;
-    tsneConfig.tsne = new tsnejs.tSNE(tsneConfig.opt);
-    tsneConfig.tsne.initDataRaw(nest.map(d=>d3.merge(d.values.map((e,i)=>[e.f]))));
-
-
-    tsneConfig.dotrain = true;
-
-    drawEmbedding(nest);
-
-
-    function drawEmbedding(data) {
-
-        let datapoint = tsneConfig.g.selectAll(".linkLineg")
-            .data(data);
-        let datapointN = datapoint
-            .enter().append("g")
-            .attr("id",d=>"clus_"+d.key)
-            .attr("class", "linkLineg");
-
-
-        datapointN.append("circle")
-            .attr("cx", 0)
-            .attr("cy", 0)
-            .attr("r", 5)
-            .attr('stroke-width', 1)
-            .attr('stroke', 'black')
-            .attr('fill', 'rgb(100,100,255)');
-
-        datapointN.append('path')
-            .style('stroke',d=>
-                filterConfig.isColorMatchCategory?color(d.values[0].topic):colorContinous(d.gap))
-            .datum(d=>d.values)
-            .attr('stroke-width',0.5);
-
-        datapointN.append("text")
-            .attr("text-anchor", "top")
-            .attr("transform", "translate(5, -5)")
-            .attr("font-size", 12);
-
-        datapoint.exit().remove();
-
-        tsneConfig.g.selectAll(".linkLineg").selectAll('path')
-            .call(d=>lineConnect(d,1))
-            .attr('stroke-width',0.5);
-
-        tsneConfig.g.selectAll(".linkLineg").selectAll('text')
-            .text(function(d,i) {return d.values[0].text })
-
-    }
-
-    tsneConfig.stepnum = 0;
-    tsneConfig.iid = -1;
-}
 
 function initLegendGroup(data){
     let nesteddata = d3.nest().key(d=>d.topic).key(d=>d.key).entries(data);
@@ -369,7 +285,7 @@ function initLegendGroup(data){
         .attr("title", "Hide group");
     legend
         .append("span")
-        .style("background", function(d,i) { return color(d.topic)})
+        .style("background", function(d,i) { return filterConfig.isColorMatchCategory?color(d.topic):null})
         .attr("class", "color-bar");
     legend
         .append("span")
@@ -1274,7 +1190,7 @@ function renderWS (data){
     let TermwDay = d3.nest().key(d=>d.timestep)
         .key(d=>d.topic)
         .rollup(e=>{return e.filter(d=>d.f).map(d=> {
-            d.color = filterConfig.isColorMatchCategory?undefined:colorContinous(nestbyKey.find(it=>it.key===d.key).gap);
+            d.color = colorContinous(nestbyKey.find(it=>it.key===d.key).gap);
             return {
             frequency: Math.sqrt(d.frequency),
                 sudden: d.sudden,

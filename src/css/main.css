@@ -62,7 +62,7 @@ body.light {
     background: #485563;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to right, #29323c, #485563);  /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to right, #29323c, #485563); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-
+    z-index: 2;
     /*background-color: #a71d31;*/
     /*background-image: linear-gradient(315deg, #a71d31 0%, #3f0d12 74%);*/
 }
@@ -335,6 +335,7 @@ blockquote{
     height: 8px;
     width: 8px;
     margin: 1px 4px 1px 0px;
+    background: currentColor;
 }
 
 .floatTitle .tally::first-letter{
@@ -479,4 +480,11 @@ sup {
 }
 .sideIn .overlaySide {
     left: -80px;
+}
+
+body .mainContain {
+    display: none;
+}
+body .mainContain.active {
+    display: block;
 }

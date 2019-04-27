@@ -225,6 +225,7 @@ function wordCloud(selector,config) {
 
         var gtext = mainGroup.selectAll('.gtext')
             .data(allWords)
+            .style('fill',function(d) {return color(boxes.topics[d.topicIndex])})
             .attrs({transform: function(d){return 'translate('+d.x+', '+d.y+')rotate('+d.rotate+')';}});
 
         var stext = gtext.selectAll('.stext')
@@ -241,7 +242,7 @@ function wordCloud(selector,config) {
             .styles({
                 'font-family': font,
                 'font-size': function(d){return d.fontSize + "px";},
-                'fill': function(d){return d.data.color||color(boxes.topics[d.topicIndex])},//function(d){return color(d.topicIndex);},
+                'fill': function(d){return filterConfig.isColorMatchCategory?null:d.data.color},//function(d){return color(d.topicIndex);},
                 'fill-opacity': function(d){return opacity(d.frequency)},
                 'text-anchor': 'middle',
                 'alignment-baseline': 'middle'
@@ -251,6 +252,7 @@ function wordCloud(selector,config) {
         gtext.enter()
             .append('g')
             .attr('class','gtext')
+            .style('fill',function(d) {return color(boxes.topics[d.topicIndex])})
             .attrs({transform: function(d){return 'translate('+d.x+', '+d.y+') rotate('+d.rotate+')';}})
             .append('text')
             .attr("class",'stext')
@@ -267,8 +269,7 @@ function wordCloud(selector,config) {
             .styles({
                 'font-family': font,
                 'font-size': function(d){return d.fontSize + "px";},
-                'fill': function(d){
-                    return d.data.color||color(boxes.topics[d.topicIndex])},//function(d){return color(d.topicIndex);},
+                'fill': function(d){return filterConfig.isColorMatchCategory?null:d.data.color},//function(d){return color(d.topicIndex);},
                 'fill-opacity': function(d){return opacity(d.frequency)},
                 'text-anchor': 'middle',
                 'alignment-baseline': 'middle'

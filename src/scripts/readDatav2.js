@@ -6,7 +6,7 @@ var chosenService = 0;
 
 var huff= function (startCut,endCut) {
     // return d3.json("src/data/Huffv2.json").then((data)=>{
-    return d3.json("src/data/Huffv4.json").then((data)=>{
+    return d3.json("src/data/Huffv3.json").then((data)=>{
         // let timestep = d3.nest().key(d=>d.timestep).entries(data).length;
         let timestep = data[0].values[0].value.length;
         let timerange = d3.range(timestep).map(function(d) { return new Date(2007, d);});
@@ -46,6 +46,7 @@ var gab = function (startCut,endCut) {
         let dataRead = [];
         data.forEach((it=>{
             it.timestep = new Date(it.timestep);
+            if (it.text!=="mydadisfbi")
             dataRead.push({
                 f:it.s,
                 df:it.ds,
